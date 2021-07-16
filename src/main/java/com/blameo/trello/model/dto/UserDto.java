@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 public class UserDto {
-    public String email;
-    public String password;
-    public String rePassword;
+    private String email;
+    private String password;
+    private String rePassword;
 }

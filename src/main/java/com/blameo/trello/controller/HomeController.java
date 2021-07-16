@@ -42,11 +42,11 @@ public class HomeController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> create(@RequestBody UserDto user) {
-        if (userRepository.checkExists(user.getEmail()) > 0 && !user.getEmail().equals(""))
-            return new ResponseEntity("Email is exist", HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<?> create(@RequestBody UserDto user) {
         if (!Validation.validateEmail(user.getEmail()))
             return new ResponseEntity("Email is invalid", HttpStatus.INTERNAL_SERVER_ERROR);
+        if (userRepository.checkExists(user.getEmail()) > 0)
+            return new ResponseEntity("Email is exist", HttpStatus.INTERNAL_SERVER_ERROR);
         if (!Validation.validatePassword(user.getPassword()))
             return new ResponseEntity("Password longer than six characters ", HttpStatus.INTERNAL_SERVER_ERROR);
         if (!user.getPassword().equals(user.getRePassword()))
@@ -69,34 +69,18 @@ public class HomeController {
         return new ResponseEntity<>(list, HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/auth")
-    public JwtRespone authenticate(@RequestBody JwtRequest jwtRequest) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            jwtRequest.getEmail(),
-                            jwtRequest.getPassword()
-                    )
-            );
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-
-        final UserDetails userDetails
-                = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
-        final String token = jwtUtility.generateToken(userDetails);
-        return new JwtRespone(token + " " + userDetails.getAuthorities());
-    }
-
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody JwtRequest jwtRequest) {
         try {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(jwtRequest.getEmail(), jwtRequest.getPassword()));
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
+
             String jwt = jwtUtility.generateToken(userDetails);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             return ResponseEntity.ok(new JwtRespone(jwt));
         } catch (Exception e) {
-            System.out.println(e);
-            return new ResponseEntity(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Email/Password invalid", HttpStatus.NOT_FOUND);
         }
     }
 

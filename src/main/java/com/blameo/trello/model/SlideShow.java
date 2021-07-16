@@ -8,18 +8,20 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Getter
-@Setter
+@Table(name = "slide_show")
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "role")
-public class Role {
+@Setter
+@Getter
+public class SlideShow {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "slide_show_id")
+    private Long slideShowId;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "image_path")
+    private String imagePath;
 
 }
+
