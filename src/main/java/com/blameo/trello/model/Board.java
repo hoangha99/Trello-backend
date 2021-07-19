@@ -6,7 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -37,16 +38,6 @@ public class Board {
     @Column(name = "is_hide")
     private Boolean isHide = false;
 
-    @ManyToMany(mappedBy = "boards")
-    private Set<User> users;
-
-
-    @OneToMany(mappedBy = "board")
-    private Set<WorkList> workLists;
-
-    public void add(User user){
-        users = new HashSet<>();
-        users.add(user);
-    }
-
+    @OneToMany(mappedBy = "board",targetEntity = BoardUser.class, cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    List<BoardUser> boardUsers;
 }

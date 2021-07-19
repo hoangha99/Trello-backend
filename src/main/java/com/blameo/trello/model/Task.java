@@ -1,6 +1,9 @@
 package com.blameo.trello.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -41,7 +44,6 @@ public class Task implements Serializable {
     @Column(name = "complete")
     private Boolean complete;
 
-    @ManyToOne
-    @JoinColumn(name = "work_list_id")
-    private WorkList workList;
+    @Column(name = "work_list_id")
+    private Long workListId;
 }

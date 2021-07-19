@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Getter
@@ -35,7 +34,9 @@ public class Comment {
     @Column(name = "created_by")
     private Long createBy;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "comment_id", referencedColumnName = "comment_id")
-    private List<ReactionComment> reactionComments;
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "task_id")
+    private Long taskId;
 }

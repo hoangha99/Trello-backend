@@ -7,8 +7,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -35,10 +33,7 @@ public class WorkList {
     @Column(name = "display_order")
     private int displayOrder;
 
-    @ManyToOne
-    @JoinColumn(name ="board_id")
-    private Board board;
+    @Column(name = "board_id")
+    private Long boardId;
 
-    @OneToMany(mappedBy = "workList")
-    private Set<Task> tasks;
 }

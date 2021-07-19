@@ -43,9 +43,7 @@ public class User {
     @Column(name = "role_id")
     private Long roleId;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "user_board",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "board_id"))
-    private Set<Board> boards;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<BoardUser> boardUsers;
+
 }
