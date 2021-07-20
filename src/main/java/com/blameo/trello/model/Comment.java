@@ -25,17 +25,14 @@ public class Comment {
     private String content;
 
     @Column(name = "is_hide")
-    private Boolean isHide;
+    private Boolean isHide = false;
 
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createDate;
+    private Date createDate = new Date();
 
     @Column(name = "created_by")
     private Long createBy;
-
-    @Column(name = "user_id")
-    private Long userId;
 
     @Column(name = "task_id")
     private Long taskId;
