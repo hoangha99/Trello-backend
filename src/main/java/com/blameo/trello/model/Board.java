@@ -38,6 +38,9 @@ public class Board {
     @Column(name = "is_hide")
     private Boolean isHide = false;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    List<WorkList> workLists;
+
     @OneToMany(mappedBy = "board",targetEntity = BoardUser.class, cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     List<BoardUser> boardUsers;
 }

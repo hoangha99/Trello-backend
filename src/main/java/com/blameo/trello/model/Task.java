@@ -1,5 +1,6 @@
 package com.blameo.trello.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +34,7 @@ public class Task implements Serializable {
 
     @Column(name = "create_date")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createDate;
+    private Date createDate = new Date();
 
     @Column(name = "create_by")
     private Long createBy;
@@ -42,8 +43,17 @@ public class Task implements Serializable {
     private Long disPlayOrder;
 
     @Column(name = "complete")
-    private Boolean complete;
+    private Boolean complete = false;
 
-    @Column(name = "work_list_id")
-    private Long workListId;
+    @Column(name = "person_work_id")
+    private Long personWorkId;
+
+    @Column(name = "deadline")
+    private Date deadline;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "work_list_id")
+    private WorkList workList;
+
 }

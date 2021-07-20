@@ -1,6 +1,7 @@
 package com.blameo.trello.controller;
 
 import com.blameo.trello.JwtUtility.JwtUtility;
+import com.blameo.trello.Util.FileUpload;
 import com.blameo.trello.Util.Validation;
 import com.blameo.trello.config.UserDetailsServiceImpl;
 import com.blameo.trello.model.User;
@@ -9,7 +10,9 @@ import com.blameo.trello.model.jwt.JwtRequest;
 import com.blameo.trello.model.jwt.JwtRespone;
 import com.blameo.trello.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,8 +21,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -39,6 +45,9 @@ public class HomeController {
 
     @Autowired
     JwtUtility jwtUtility;
+
+    @Autowired
+    FileUpload fileUpload;
 
 
     @PostMapping("/register")
@@ -90,4 +99,36 @@ public class HomeController {
         return new ResponseEntity<>(userRepository.findByUsername(name), HttpStatus.OK);
     }
 
+
+    @PostMapping("/upload-file")
+    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) throws IOException {
+        System.out.println(file.getOriginalFilename());
+        System.out.println(file.getSize());
+        System.out.println(file.getContentType());
+        if(file.isEmpty()){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("wrong");
+        }
+        if(!file.getContentType().equals("image/jpeg")){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("wrong");
+        }
+        System.out.println(fileUpload.uploadFile(file));
+        return ResponseEntity.ok("ok");
+    }
+
+    @GetMapping("/download/{fileName}")
+    ResponseEntity<Resource> downLoadSingleFile(@PathVariable String fileName, HttpServletRequest request) {
+        Resource resource = fileUpload.downloadFile(fileName);
+        String mimeType;
+
+        try {
+            mimeType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException e) {
+            mimeType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        }
+        mimeType = mimeType == null ? MediaType.APPLICATION_OCTET_STREAM_VALUE : mimeType;
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(mimeType))
+                .body(resource);
+    }
 }

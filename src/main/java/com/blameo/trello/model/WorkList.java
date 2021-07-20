@@ -1,5 +1,6 @@
 package com.blameo.trello.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,22 +20,27 @@ public class WorkList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "work_list_id")
-    private Integer workListId;
+    private Long workListId;
 
     @Column(name = "title")
     private String title;
 
     @Column(name = "create_date")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createDate;
+    private Date createDate = new Date();
 
     @Column(name = "create_by")
-    private int createBy;
+    private Long createBy;
 
     @Column(name = "display_order")
-    private int displayOrder;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long displayOrder;
 
-    @Column(name = "board_id")
-    private Long boardId;
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "board_id")
+    private Board board;
 
+    @OneToMany(mappedBy = "workList", cascade = CascadeType.ALL)
+    private List<Task> tasks;
 }

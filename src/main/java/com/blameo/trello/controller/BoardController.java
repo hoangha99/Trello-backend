@@ -6,6 +6,7 @@ import com.blameo.trello.model.User;
 import com.blameo.trello.repository.BoardRepository;
 import com.blameo.trello.repository.BoardUserRepository;
 import com.blameo.trello.repository.UserRepository;
+import com.blameo.trello.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -28,17 +30,12 @@ public class BoardController {
     @Autowired
     BoardUserRepository boardUserRepository;
 
+    @Autowired
+    BoardService boardService;
+
     @PostMapping("/create")
     public ResponseEntity<?> createBoard(@RequestParam("title") String title, Authentication authentication) {
-        User user = userRepository.findByUsername(authentication.getName());
-        Board board = new Board();
-        board.setTitle(title);
-        board.setCreateBy(user.getId());
-        BoardUser boardUser = new BoardUser();
-        boardUser.setUser(user);
-        boardUser.setBoard(board);
-        boardRepository.save(board);
-        boardUserRepository.save(boardUser);
+        boardService.createBoard(title, authentication);
         return ResponseEntity.ok("Create success");
     }
 
@@ -63,7 +60,8 @@ public class BoardController {
             boardUserList.forEach(bu -> {
                 boardList.add(boardRepository.findByBoardUsers(bu));
             });
-            return new ResponseEntity<>(boardList, HttpStatus.OK);
+            List<Board> list = boardList.stream().filter(x -> x.getIsHide().equals(false)).collect(Collectors.toList());
+            return new ResponseEntity<>(list, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
