@@ -5,7 +5,6 @@ public class Validation {
 
     public static Boolean validateEmail(String email) {
         return email.matches(regex);
-
     }
 
     public static Boolean validatePassword(String pass) {
