@@ -3,10 +3,16 @@ package com.blameo.trello.controller;
 import com.blameo.trello.model.Board;
 import com.blameo.trello.model.BoardUser;
 import com.blameo.trello.model.User;
+import com.blameo.trello.model.dto.BoarDto;
+import com.blameo.trello.model.dto.SearchUserDto;
+import com.blameo.trello.model.dto.UserDto;
+import com.blameo.trello.model.request.BoardRequest;
+import com.blameo.trello.model.request.SearchUserRequest;
 import com.blameo.trello.repository.BoardRepository;
 import com.blameo.trello.repository.BoardUserRepository;
 import com.blameo.trello.repository.UserRepository;
 import com.blameo.trello.service.BoardService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,15 +41,15 @@ public class BoardController {
     BoardService boardService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createBoard(@RequestParam("title") String title, Authentication authentication) {
-        boardService.createBoard(title, authentication);
+    public ResponseEntity<?> createBoard(@RequestBody BoardRequest boardRequest, Authentication authentication) {
+        boardService.createBoard(boardRequest.getTitle(), authentication);
         return ResponseEntity.ok("Create success");
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<HttpStatus> deleteBoard(@RequestParam("id") Long id) {
+    public ResponseEntity<HttpStatus> deleteBoard(@RequestBody BoardRequest boardRequest) {
         try {
-            Board board = boardRepository.getById(id);
+            Board board = boardRepository.getById(boardRequest.getBoardId());
             board.setIsHide(true);
             boardRepository.save(board);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -51,8 +58,8 @@ public class BoardController {
         }
     }
 
-    @GetMapping("/getAll")
-    public ResponseEntity<List<Board>> getAll(Authentication authentication) {
+    @GetMapping("/get-all")
+    public ResponseEntity<?> getAll(Authentication authentication) {
         try {
             List<BoardUser> boardUserList =
                     boardUserRepository.findByUser(userRepository.findByUsername(authentication.getName()));
@@ -61,24 +68,54 @@ public class BoardController {
                 boardList.add(boardRepository.findByBoardUsers(bu));
             });
             List<Board> list = boardList.stream().filter(x -> x.getIsHide().equals(false)).collect(Collectors.toList());
-            return new ResponseEntity<>(list, HttpStatus.OK);
+            List<BoarDto> dtoList = new ArrayList<>();
+            list.forEach(x -> {
+                BoarDto dto = new BoarDto();
+                BeanUtils.copyProperties(x, dto);
+                dtoList.add(dto);
+            });
+            return new ResponseEntity<>(dtoList, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/addUserToBoard")
+    @PutMapping("/add-user-to-board")
     public ResponseEntity<?> addUserToBoard(@RequestParam("userId") Long userId, @RequestParam("boardId") Long boardId) {
         try {
             User user = userRepository.getById(userId);
             Board board = boardRepository.getById(boardId);
-            BoardUser boardUser = new BoardUser();
-            boardUser.setUser(user);
-            boardUser.setBoard(board);
-            boardUserRepository.save(boardUser);
-            return new ResponseEntity<>(HttpStatus.OK);
+            if (!boardUserRepository.findByBoardAndUser(user, board).isPresent()) {
+                BoardUser boardUser = new BoardUser();
+                boardUser.setUser(user);
+                boardUser.setBoard(board);
+                boardUserRepository.save(boardUser);
+                return new ResponseEntity<>("Add user to board success",HttpStatus.OK);
+            }
+            return new ResponseEntity<>("User is exist in board", HttpStatus.INTERNAL_SERVER_ERROR);
+
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @GetMapping("/get-list-person")
+    public ResponseEntity<?> getListUser(@RequestBody SearchUserRequest searchUserRequest) {
+        Set<User> list =userRepository.getUserByKeyword(searchUserRequest.getKeyword(), searchUserRequest.getBoardId());
+        List<SearchUserDto> dtoList = new ArrayList<>();
+        list.forEach(x ->{
+            SearchUserDto dto = new SearchUserDto();
+            BeanUtils.copyProperties(x, dto);
+            dtoList.add(dto);
+        });
+        return new ResponseEntity<>(dtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-all-user-in-board")
+    public ResponseEntity<?> getUserInBoard(@RequestParam("boardId") Long boardId) {
+        if (boardRepository.findById(boardId).isPresent()) {
+            List<SearchUserDto> list = boardService.getUserInBoard(boardId);
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

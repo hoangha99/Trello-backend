@@ -1,16 +1,16 @@
 package com.blameo.trello.controller;
 
-import com.blameo.trello.model.Task;
-import com.blameo.trello.model.User;
-import com.blameo.trello.repository.BoardRepository;
-import com.blameo.trello.repository.TaskRepository;
-import com.blameo.trello.repository.UserRepository;
+import com.blameo.trello.model.dto.SearchUserDto;
+import com.blameo.trello.model.request.TaskRequest;
 import com.blameo.trello.repository.WorkListRepository;
+import com.blameo.trello.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -21,49 +21,38 @@ public class TaskController {
     WorkListRepository workListRepository;
 
     @Autowired
-    TaskRepository taskRepository;
-
-    @Autowired
-    BoardRepository boardRepository;
-
-    @Autowired
-    UserRepository userRepository;
+    TaskService taskService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createTask(@RequestParam("workListId") Long workListId, @RequestParam("title") String title, Authentication authentication) {
-        User user = userRepository.findByUsername(authentication.getName());
-        if (workListRepository.findById(workListId).isPresent()) {
-            Task task = new Task();
-            task.setDisPlayOrder(taskRepository.countDisplayOrder(workListId) + 1l);
-            task.setCreateBy(user.getId());
-            task.setTitle(title);
-            task.setWorkList(workListRepository.getById(workListId));
-            taskRepository.save(task);
+    public ResponseEntity<?> createTask(@RequestBody TaskRequest taskRequest, Authentication authentication) {
+        if (workListRepository.findById(taskRequest.getWorkListId()).isPresent()) {
+            taskService.createTask(taskRequest.getWorkListId(), taskRequest.getTitle(), authentication);
             return ResponseEntity.ok("Create success");
         }
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PutMapping("/add-person-to-task")
-    public ResponseEntity<?> addPersonToTask(@RequestParam("taskId") Long taskId, @RequestParam("userId") Long userId) {
-        if (taskRepository.findById(taskId).isPresent() && userRepository.findById(userId).isPresent()) {
-            Task task = taskRepository.findById(taskId).get();
-            task.setPersonWorkId(userId);
-            taskRepository.save(task);
-            return ResponseEntity.ok("Add person to task success");
-        }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<?> addPersonToTask(@RequestBody TaskRequest taskRequest) {
+        String message = taskService.addPersonToTask(taskRequest.getTaskId(), taskRequest.getUserId());
+        return ResponseEntity.ok(message);
     }
 
     @PutMapping("/delete-person-to-task")
-    public ResponseEntity<?> deletePersonToTask(@RequestParam("taskId") Long taskId) {
-        if (taskRepository.findById(taskId).isPresent()) {
-            Task task = taskRepository.findById(taskId).get();
-            task.setPersonWorkId(null);
-            taskRepository.save(task);
-            return ResponseEntity.ok("Delete person to task success");
-        }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<?> deletePersonToTask(@RequestBody TaskRequest taskRequest) {
+        String message = taskService.deletePersonToTask(taskRequest.getTaskId(), taskRequest.getUserId());
+        return ResponseEntity.ok(message);
     }
 
+    @PutMapping("/update-display-order")
+    public ResponseEntity<?> updateDisplayOrder(@RequestBody TaskRequest taskRequest) {
+        taskService.updateDisplayOrder(taskRequest.getRemoveId(), taskRequest.getRemovedIndex(), taskRequest.getAddId(), taskRequest.getAddedIndex());
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-all-person-in-task")
+    public ResponseEntity<?> getAllPersonInTask(@RequestParam("taskId") Long taskId) {
+        List<SearchUserDto> user = taskService.getAllPersonInTask(taskId);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 }

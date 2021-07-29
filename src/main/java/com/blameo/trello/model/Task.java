@@ -9,6 +9,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -45,9 +47,6 @@ public class Task implements Serializable {
     @Column(name = "complete")
     private Boolean complete = false;
 
-    @Column(name = "person_work_id")
-    private Long personWorkId;
-
     @Column(name = "deadline")
     private Date deadline;
 
@@ -55,5 +54,8 @@ public class Task implements Serializable {
     @JsonIgnore
     @JoinColumn(name = "work_list_id")
     private WorkList workList;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<TaskUser> taskUsers;
 
 }

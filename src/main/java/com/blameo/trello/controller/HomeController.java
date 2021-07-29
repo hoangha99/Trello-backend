@@ -5,10 +5,12 @@ import com.blameo.trello.Util.FileUpload;
 import com.blameo.trello.Util.Validation;
 import com.blameo.trello.config.UserDetailsServiceImpl;
 import com.blameo.trello.model.User;
+import com.blameo.trello.model.dto.SearchUserDto;
 import com.blameo.trello.model.dto.UserDto;
 import com.blameo.trello.model.jwt.JwtRequest;
 import com.blameo.trello.model.jwt.JwtRespone;
 import com.blameo.trello.repository.UserRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -96,6 +99,7 @@ public class HomeController {
     @GetMapping("/getInfo")
     public ResponseEntity<?> getName(Authentication authentication) {
         String name = authentication.getName();
+        System.out.println(name);
         return new ResponseEntity<>(userRepository.findByUsername(name), HttpStatus.OK);
     }
 

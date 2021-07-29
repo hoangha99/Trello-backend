@@ -46,7 +46,7 @@ public class CommentController {
             comment.setContent(content);
             comment.setTaskId(taskId);
             commentRepository.save(comment);
-            return ResponseEntity.ok("Create success");
+            return new ResponseEntity<>(comment, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }

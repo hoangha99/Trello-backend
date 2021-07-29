@@ -8,16 +8,18 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "board_user")
-public class BoardUser {
+@Table(name = "task_user")
+public class TaskUser {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_user_id")
+    @Column(name = "task_user_id")
     private Long id;
 
     @ManyToOne
@@ -27,6 +29,6 @@ public class BoardUser {
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "boardId", nullable = false)
-    private Board board;
+    @JoinColumn(name = "taskId", nullable = false)
+    private Task task;
 }
