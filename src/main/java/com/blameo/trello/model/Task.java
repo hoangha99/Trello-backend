@@ -44,12 +44,6 @@ public class Task implements Serializable {
     @Column(name = "display_order")
     private Long disPlayOrder;
 
-    @Column(name = "complete")
-    private Boolean complete = false;
-
-    @Column(name = "deadline")
-    private Date deadline;
-
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "work_list_id")

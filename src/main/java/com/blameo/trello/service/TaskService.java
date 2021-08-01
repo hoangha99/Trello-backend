@@ -103,7 +103,6 @@ public class TaskService {
 
     public List<SearchUserDto> getAllPersonInTask(Long taskId) {
         List<SearchUserDto> userDtos =  new ArrayList<>();
-
         List<TaskUser> taskUsers = taskUserRepository.findByTask(taskRepository.getById(taskId));
 
         taskUsers.forEach(x ->{

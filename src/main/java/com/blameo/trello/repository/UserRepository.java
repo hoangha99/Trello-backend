@@ -22,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "where (bu.user.id is null) and (us.fullName like %:keyword% or us.email like %:keyword%)")
     Set<User> getUserByKeyword(@Param("keyword") String keyword, @Param("boardId") Long boardId);
 
+//    Set<User> getByKeyworkInTask(@Param("keyword") String keyword, @Param("boardId") Long boardId);
+
 }

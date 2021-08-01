@@ -98,9 +98,10 @@ public class HomeController {
 
     @GetMapping("/getInfo")
     public ResponseEntity<?> getName(Authentication authentication) {
-        String name = authentication.getName();
-        System.out.println(name);
-        return new ResponseEntity<>(userRepository.findByUsername(name), HttpStatus.OK);
+        User user = userRepository.findByUsername(authentication.getName());
+        SearchUserDto searchUserDto = new SearchUserDto();
+        BeanUtils.copyProperties(user, searchUserDto);
+        return new ResponseEntity<>(searchUserDto, HttpStatus.OK);
     }
 
 

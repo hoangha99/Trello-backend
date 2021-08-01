@@ -85,7 +85,7 @@ public class BoardController {
         try {
             User user = userRepository.getById(userId);
             Board board = boardRepository.getById(boardId);
-            if (!boardUserRepository.findByBoardAndUser(user, board).isPresent()) {
+            if (!boardUserRepository.findByBoardAndUser(userId, boardId).isPresent()) {
                 BoardUser boardUser = new BoardUser();
                 boardUser.setUser(user);
                 boardUser.setBoard(board);
@@ -95,7 +95,7 @@ public class BoardController {
             return new ResponseEntity<>("User is exist in board", HttpStatus.INTERNAL_SERVER_ERROR);
 
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @GetMapping("/get-list-person")
