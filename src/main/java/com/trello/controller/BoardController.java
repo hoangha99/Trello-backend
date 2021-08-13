@@ -104,6 +104,7 @@ public class BoardController {
         list.forEach(x ->{
             SearchUserDto dto = new SearchUserDto();
             BeanUtils.copyProperties(x, dto);
+            dto.setId(x.getUserId());
             dtoList.add(dto);
         });
         return new ResponseEntity<>(dtoList, HttpStatus.OK);

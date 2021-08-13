@@ -45,6 +45,7 @@ public class BoardService {
         boardUserList.forEach(x->{
             SearchUserDto searchUserDto = new SearchUserDto();
             BeanUtils.copyProperties(x.getUser(), searchUserDto);
+            searchUserDto.setId(x.getUser().getUserId());
             searchUserDtos.add(searchUserDto);
         });
         return searchUserDtos;

@@ -111,6 +111,7 @@ public class TaskService {
         taskUsers.forEach(x -> {
             SearchUserDto userDto = new SearchUserDto();
             BeanUtils.copyProperties(x.getUser(), userDto);
+            userDto.setId(x.getUser().getUserId());
             userDtos.add(userDto);
         });
         return userDtos;
