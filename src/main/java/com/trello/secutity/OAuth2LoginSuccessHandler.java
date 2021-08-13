@@ -43,7 +43,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     }
 
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, UserDetails userDetails) {
-        String targetUrl = "https://trello-blameo-fe.herokuapp.com/oauth2/redirect";
+        String targetUrl = "http://localhost:3000/oauth2/redirect";
         String token = jwtUtility.generateToken(userDetails);
 
         return UriComponentsBuilder.fromUriString(targetUrl)
