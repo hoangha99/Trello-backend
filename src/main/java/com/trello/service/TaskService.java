@@ -42,7 +42,7 @@ public class TaskService {
         task.setTitle(title);
         WorkList workList = workListRepository.getById(workListId);
         task.setWorkList(workList);
-        task.setCreateBy(user.getId());
+        task.setCreateBy(user.getUserId());
         taskRepository.save(task);
     }
 

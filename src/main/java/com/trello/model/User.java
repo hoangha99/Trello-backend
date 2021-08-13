@@ -14,13 +14,13 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Long id;
+    private Long userId;
 
     @Column(name = "full_name")
     private String fullName;
@@ -44,10 +44,10 @@ public class User {
     @Column(name = "role_id")
     private Long roleId;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", targetEntity = BoardUser.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<BoardUser> boardUsers;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    Set<TaskUser> taskUsers;
+    @OneToMany(mappedBy = "user",targetEntity = TaskUser.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<TaskUser> taskUsers;
 
 }

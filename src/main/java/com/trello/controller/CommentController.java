@@ -44,7 +44,7 @@ public class CommentController {
         if (taskRepository.findById(commentRequest.getTaskId()).isPresent()) {
             User user = userRepository.findByUsername(authentication.getName());
             Comment comment = new Comment();
-            comment.setCreateBy(user.getId());
+            comment.setCreateBy(user.getUserId());
             comment.setContent(commentRequest.getContent());
             comment.setTaskId(commentRequest.getTaskId());
             commentRepository.save(comment);

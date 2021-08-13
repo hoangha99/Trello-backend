@@ -30,7 +30,7 @@ public class BoardService {
         User user = userRepository.findByUsername(authentication.getName());
         Board board = new Board();
         board.setTitle(title);
-        board.setCreateBy(user.getId());
+        board.setCreateBy(user.getUserId());
         BoardUser boardUser = new BoardUser();
         boardUser.setUser(user);
         boardUser.setBoard(board);

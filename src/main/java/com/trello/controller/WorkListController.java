@@ -40,7 +40,7 @@ public class WorkListController {
         if (board.isPresent()) {
             User user = userRepository.findByUsername(authentication.getName());
             WorkList workList = new WorkList();
-            workList.setCreateBy(user.getId());
+            workList.setCreateBy(user.getUserId());
             workList.setBoard(board.get());
             workList.setTitle(workListRequest.getTitle());
             workList.setDisplayOrder(workListRepository.countDisplayOrder(workListRequest.getBoardId()));

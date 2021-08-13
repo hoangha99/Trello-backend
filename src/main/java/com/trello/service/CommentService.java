@@ -33,7 +33,7 @@ public class CommentService {
             BeanUtils.copyProperties(x, commentDto);
             String fullName = userRepository.getById(x.getCreateBy()).getFullName();
             commentDto.setFullName(fullName);
-            if(x.getCreateBy()==user.getId()){
+            if(x.getCreateBy()==user.getUserId()){
                 commentDto.setEdit(true);
             }
             list.add(commentDto);
